@@ -49,6 +49,10 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ include "paperclip.imageTag" . }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          # Skip the gosu-based entrypoint; K8s securityContext already sets UID/GID
+          command: ["node"]
+          args: ["--import", "./server/node_modules/tsx/dist/loader.mjs", "server/dist/index.js"]
+          workingDir: /app
           securityContext:
             {{- toYaml .Values.containerSecurityContext | nindent 12 }}
           ports:
