@@ -20,7 +20,7 @@ minikube start
 export AUTH_SECRET=$(openssl rand -hex 32)
 
 # 3. Install the chart
-helm install paperclip ./papaerclip-chart \
+helm install paperclip ./paperclip-chart \
   --set auth.secret=$AUTH_SECRET
 
 # 4. Get the access URL
@@ -40,7 +40,7 @@ For auth callbacks to work correctly, set the public URL to the actual minikube 
 ```bash
 export MINIKUBE_URL=$(minikube service paperclip --url)
 
-helm upgrade paperclip ./papaerclip-chart \
+helm upgrade paperclip ./paperclip-chart \
   --set auth.secret=$AUTH_SECRET \
   --set paperclip.publicUrl=$MINIKUBE_URL
 ```
@@ -117,7 +117,7 @@ in-cluster PostgreSQL when you need a dedicated database:
 
 ```bash
 # Install with in-cluster PostgreSQL
-helm install paperclip ./papaerclip-chart \
+helm install paperclip ./paperclip-chart \
   --set auth.secret=$AUTH_SECRET \
   --set postgresql.enabled=true
 ```
@@ -131,7 +131,7 @@ Connect to an existing PostgreSQL instance instead:
 | `externalDatabase.url` | `""` | Full `postgres://` connection URL |
 
 ```bash
-helm install paperclip ./papaerclip-chart \
+helm install paperclip ./paperclip-chart \
   --set auth.secret=$AUTH_SECRET \
   --set externalDatabase.url="postgres://user:pass@host:5432/paperclip"
 ```
@@ -146,7 +146,7 @@ kubectl create secret generic paperclip-auth \
   --from-literal=BETTER_AUTH_SECRET=$(openssl rand -hex 32)
 
 # Reference it
-helm install paperclip ./papaerclip-chart \
+helm install paperclip ./paperclip-chart \
   --set auth.existingSecret=paperclip-auth
 ```
 
@@ -173,7 +173,7 @@ The most common cause is a missing or invalid `BETTER_AUTH_SECRET`.
 
 Set `paperclip.publicUrl` to the actual URL you access the UI at:
 ```bash
-helm upgrade paperclip ./papaerclip-chart \
+helm upgrade paperclip ./paperclip-chart \
   --set auth.secret=$AUTH_SECRET \
   --set paperclip.publicUrl=http://192.168.49.2:31000
 ```
