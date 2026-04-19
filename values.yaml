@@ -3,7 +3,7 @@ replicaCount: 1
 
 image:
   # -- Container image repository
-  repository: ghcr.io/paperclipai/paperclip
+  repository: ghcr.io/astoycos/paperclip
   # -- Image tag (defaults to chart appVersion)
   tag: ""
   # -- Image pull policy
