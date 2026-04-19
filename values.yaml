@@ -1,0 +1,151 @@
+# -- Number of Paperclip server replicas (only 1 supported with embedded PGlite)
+replicaCount: 1
+
+image:
+  # -- Container image repository
+  repository: ghcr.io/paperclipai/paperclip
+  # -- Image tag (defaults to chart appVersion)
+  tag: ""
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+
+# -- Image pull secrets for private registries
+imagePullSecrets: []
+
+# -- Override the chart name
+nameOverride: ""
+# -- Override the full release name
+fullnameOverride: ""
+
+# ---------------------------------------------------------------------------
+# Paperclip server configuration
+# ---------------------------------------------------------------------------
+paperclip:
+  # -- Data home directory inside the container
+  home: /paperclip
+  # -- Bind address (0.0.0.0 for container use)
+  host: "0.0.0.0"
+  # -- Server listen port
+  port: "3100"
+  # -- Serve built UI from the server process
+  serveUi: "true"
+  # -- Deployment mode: local_trusted | authenticated
+  deploymentMode: authenticated
+  # -- Deployment exposure: private | public
+  deploymentExposure: private
+  # -- Public URL for auth callbacks. Leave empty to auto-detect from service.
+  # For minikube use: http://<minikube-ip>:<nodePort>
+  publicUrl: ""
+
+# ---------------------------------------------------------------------------
+# Authentication (required for authenticated mode)
+# ---------------------------------------------------------------------------
+auth:
+  # -- BETTER_AUTH_SECRET value (64-char hex). Required unless existingSecret is set.
+  # Generate with: openssl rand -hex 32
+  secret: ""
+  # -- Use an existing Kubernetes Secret instead of creating one.
+  # The secret must contain key `BETTER_AUTH_SECRET`.
+  existingSecret: ""
+  # -- Key inside the existing secret that holds BETTER_AUTH_SECRET
+  existingSecretKey: BETTER_AUTH_SECRET
+
+# ---------------------------------------------------------------------------
+# Agent adapter API keys (optional)
+# ---------------------------------------------------------------------------
+adapters:
+  # -- OpenAI / Codex API key
+  openaiApiKey: ""
+  # -- Anthropic / Claude API key
+  anthropicApiKey: ""
+
+# ---------------------------------------------------------------------------
+# Persistence for /paperclip data directory
+# ---------------------------------------------------------------------------
+persistence:
+  # -- Enable persistent storage (recommended)
+  enabled: true
+  # -- Storage class (empty = cluster default, e.g. minikube "standard")
+  storageClass: ""
+  # -- Access mode
+  accessMode: ReadWriteOnce
+  # -- Volume size
+  size: 5Gi
+  # -- Annotations for the PVC
+  annotations: {}
+
+# ---------------------------------------------------------------------------
+# In-cluster PostgreSQL (disabled by default — uses embedded PGlite)
+# ---------------------------------------------------------------------------
+postgresql:
+  # -- Deploy an in-cluster PostgreSQL StatefulSet
+  enabled: false
+  image:
+    repository: postgres
+    tag: "17-alpine"
+    pullPolicy: IfNotPresent
+  auth:
+    username: paperclip
+    password: paperclip
+    database: paperclip
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 5Gi
+  resources: {}
+
+# ---------------------------------------------------------------------------
+# External database (overrides both embedded PGlite and in-cluster PostgreSQL)
+# ---------------------------------------------------------------------------
+externalDatabase:
+  # -- Full postgres:// connection URL
+  url: ""
+
+# ---------------------------------------------------------------------------
+# Service
+# ---------------------------------------------------------------------------
+service:
+  # -- Kubernetes service type
+  type: NodePort
+  # -- Service port
+  port: 3100
+  # -- NodePort (only used when type=NodePort). Set to null for auto-assign.
+  nodePort: 31000
+
+# ---------------------------------------------------------------------------
+# Service account
+# ---------------------------------------------------------------------------
+serviceAccount:
+  # -- Create a dedicated ServiceAccount
+  create: true
+  # -- Annotations for the ServiceAccount
+  annotations: {}
+  # -- Override ServiceAccount name (defaults to fullname)
+  name: ""
+
+# ---------------------------------------------------------------------------
+# Pod configuration
+# ---------------------------------------------------------------------------
+podAnnotations: {}
+podLabels: {}
+
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+
+resources: {}
+  # limits:
+  #   cpu: 1000m
+  #   memory: 1Gi
+  # requests:
+  #   cpu: 250m
+  #   memory: 512Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

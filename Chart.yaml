@@ -1,0 +1,16 @@
+apiVersion: v2
+name: paperclip
+description: Helm chart for deploying Paperclip — an AI-agent control plane
+type: application
+version: 0.1.0
+appVersion: "2026.416.0"
+home: https://github.com/paperclipai/paperclip
+sources:
+  - https://github.com/paperclipai/paperclip
+keywords:
+  - paperclip
+  - ai
+  - agents
+  - control-plane
+maintainers:
+  - name: astoycos

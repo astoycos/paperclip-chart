@@ -1,0 +1,46 @@
+
+=== Paperclip ({{ .Chart.AppVersion }}) ===
+
+{{- if eq .Values.service.type "NodePort" }}
+
+Access Paperclip UI:
+
+  On minikube:
+    minikube service {{ include "paperclip.fullname" . }} --url
+
+  Or directly:
+    export NODE_PORT=$(kubectl get svc {{ include "paperclip.fullname" . }} -o jsonpath='{.spec.ports[0].nodePort}')
+    export NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[0].address}')
+    echo "http://${NODE_IP}:${NODE_PORT}"
+
+{{- else if eq .Values.service.type "ClusterIP" }}
+
+Access Paperclip UI via port-forward:
+
+  kubectl port-forward svc/{{ include "paperclip.fullname" . }} 3100:{{ .Values.service.port }}
+  open http://localhost:3100
+
+{{- end }}
+
+Deployment mode: {{ .Values.paperclip.deploymentMode }} / {{ .Values.paperclip.deploymentExposure }}
+{{- if .Values.paperclip.publicUrl }}
+Public URL:      {{ .Values.paperclip.publicUrl }}
+{{- else }}
+Public URL:      (not set — set paperclip.publicUrl for auth callbacks)
+{{- end }}
+
+{{- if not .Values.postgresql.enabled }}
+{{- if not .Values.externalDatabase.url }}
+Database:        embedded PGlite (data stored in PVC)
+{{- else }}
+Database:        external ({{ .Values.externalDatabase.url }})
+{{- end }}
+{{- else }}
+Database:        in-cluster PostgreSQL ({{ include "paperclip.postgresql.fullname" . }})
+{{- end }}
+
+IMPORTANT: On first login, Paperclip will display a board-claim URL in the
+server logs. Use it to claim board ownership:
+
+  kubectl logs deploy/{{ include "paperclip.fullname" . }} | grep board-claim
+
